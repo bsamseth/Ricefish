@@ -14,14 +14,16 @@ constexpr std::array<char, PEBBLE_NB + 2> PEBBLE_CHAR = { ' ', '.', 'x', '+'};
 
 class Board {
     constexpr static int X_SIZE = 19, Y_SIZE = 19;
-    std::array<std::array<Pebble, Y_SIZE>, X_SIZE> _squares;
+    std::array<std::array<Pebble, X_SIZE>, Y_SIZE> _squares;
     Pebble _turn;
     
 public:
     
     Board();
     
-    bool inside_board(int x, int y);
+    bool inside_board(int x, int y) const;
+    bool inside_P1(int x, int y) const;
+    bool inside_P2(int x, int y) const;
     
     friend std::ostream& operator<<(std::ostream&, const Board&);
 };
