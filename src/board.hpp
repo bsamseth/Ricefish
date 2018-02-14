@@ -20,7 +20,9 @@ public:
     void do_move(const Move &move);
     void undo_move(const Move &move);
     void generate_moves(std::vector<Move> &moves);
-    void generate_jumps(const Hole &from, std::vector<Move> &moves);
+    void generate_jumps(const Hole &origin,
+                        const Hole &from,
+                        std::vector<Move> &moves);
 
     // Score.
     int score() const;

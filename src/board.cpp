@@ -70,13 +70,15 @@ void Board::generate_moves(std::vector<Move> &moves) {
                 }
 
                 // Generate all jumps.
-                generate_jumps(from, moves);
+                generate_jumps(from, from, moves);
             }
         }
     }
 }
 
-void Board::generate_jumps(const Hole &from, std::vector<Move> &moves) {
+void Board::generate_jumps(const Hole &origin,
+                           const Hole &from,
+                           std::vector<Move> &moves) {
     const Pebble original = _squares[from.y][from.x];
     _squares[from.y][from.x] = _turn;
 
@@ -86,8 +88,8 @@ void Board::generate_jumps(const Hole &from, std::vector<Move> &moves) {
         if (    _squares[over.y][over.x] != NO_PEBBLE
             and _squares[over.y][over.x] != INVALID
             and _squares[to.y][to.x] == NO_PEBBLE) {
-            moves.push_back({from, to});
-            generate_jumps(to, moves);
+            moves.push_back({origin, to});
+            generate_jumps(origin, to, moves);
         }
     }
     _squares[from.y][from.x] = original;
