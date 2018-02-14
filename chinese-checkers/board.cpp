@@ -1,7 +1,10 @@
+#include <cassert>
 
 #include "board.hpp"
 
-Board::Board() {
+
+
+Board::Board() : _turn(P1) {
     for (int y = 0; y < Y_SIZE; ++y) {
         _squares[y] = { INVALID };
         for (int x = 0; x < X_SIZE; ++x) {
@@ -15,28 +18,62 @@ Board::Board() {
     }
 }
 
-bool Board::inside_board(int x, int y) const {
-    int sum = x + y;
-    return (x <= 13 and y <= 13 and 14 <= sum and sum <= 26)
-        or (5 <= x and 5 <= y and 10 <= sum and sum <= 22);
+void Board::do_move(const Move &move) {
+    assert(_squares[move.from.y][move.from.x] == _turn);
+    _squares[move.to.y][move.to.x] = _squares[move.from.y][move.from.x];
+    _squares[move.from.y][move.from.x] = NO_PEBBLE;
+    _turn = swap(_turn);
 }
 
-bool Board::inside_P1(int x, int y) const {
-    int sum = x + y;
-    return 10 <= x and x <= 13 and 1 <= y and y <= 4
-        and 14 <= sum and sum <= 17;
+void Board::undo_move(const Move &move) {
+    _turn = swap(_turn);
+    _squares[move.from.y][move.from.x] = _turn;
+    _squares[move.to.y][move.to.x] = NO_PEBBLE;
 }
 
-bool Board::inside_P2(int x, int y) const {
-    int sum = x + y;
-    return 5 <= x and x <= 8 and 14 <= y and y <= 17
-        and 19 <= sum and sum <= 22;
+void Board::generate_moves(std::vector<Move> &moves) {
+    for (int y = 0; y < Y_SIZE; ++y) {
+        for (int x = 0; x < X_SIZE; ++x) {
+            Hole from = {x, y};
+            Pebble &pebble = _squares[y][x];
+
+            if (pebble == _turn) {
+
+                // Generate all single steps.
+                for (const Direction &dir : directions_steps) {
+                    Hole to = {x + dir.dx, y + dir.dy};
+                    if (_squares[to.y][to.x] == NO_PEBBLE)
+                        moves.push_back({from, to});
+                }
+
+                // Generate all jumps.
+                generate_jumps(from, moves);
+            }
+        }
+    }
+}
+
+void Board::generate_jumps(const Hole &from, std::vector<Move> &moves) {
+    const Pebble original = _squares[from.y][from.x];
+    _squares[from.y][from.x] = _turn;
+
+    for (const Direction &dir : directions_steps) {
+        Hole over = {from.x +     dir.dx, from.y +     dir.dy};
+        Hole to   = {from.x + 2 * dir.dx, from.y + 2 * dir.dy};
+        if (    _squares[over.y][over.x] != NO_PEBBLE
+            and _squares[over.y][over.x] != INVALID
+            and _squares[to.y][to.x] == NO_PEBBLE) {
+            moves.push_back({from, to});
+            generate_jumps(to, moves);
+        }
+    }
+    _squares[from.y][from.x] = original;
 }
 
 std::ostream& operator<<(std::ostream &strm, const Board &b) {
-    for (int x = 0; x < b.X_SIZE; ++x) {
-        for (int y = 0; y < b.Y_SIZE; ++y) {
-            strm << PEBBLE_CHAR[b._squares[x][y]] << ' ';
+    for (int y = 0; y < Y_SIZE; ++y) {
+        for (int x = 0; x < X_SIZE; ++x) {
+            strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
         }
         strm << '\n';
     }
