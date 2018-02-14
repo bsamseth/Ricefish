@@ -14,11 +14,13 @@ using namespace std;
 int main(int argc, const char * argv[]) {
 
     Board board;
+    cout << "Initial score: " << board.score() << endl;
     std::vector<Move> moves;
     board.generate_moves(moves);
     for (const Move &move : moves) {
         board.do_move(move);
         cout << board << endl;
+        cout << "score: " << board.score() << endl;
         board.undo_move(move);
     }
     return 0;

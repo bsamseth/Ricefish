@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cmath>
 
 #include "board.hpp"
 
@@ -16,6 +17,16 @@ Board::Board() : _turn(P1) {
                 _squares[y][x] = NO_PEBBLE;
         }
     }
+}
+
+std::ostream& operator<<(std::ostream &strm, const Board &b) {
+    for (int y = 0; y < Y_SIZE; ++y) {
+        for (int x = 0; x < X_SIZE; ++x) {
+            strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
+        }
+        strm << '\n';
+    }
+    return strm;
 }
 
 void Board::do_move(const Move &move) {
@@ -70,13 +81,38 @@ void Board::generate_jumps(const Hole &from, std::vector<Move> &moves) {
     _squares[from.y][from.x] = original;
 }
 
-std::ostream& operator<<(std::ostream &strm, const Board &b) {
+int Board::score() const {
+    return _turn == P1 ?  score_by_side<P1>()
+                        : score_by_side<P2>();
+}
+
+
+int Board::dist(const Hole &a, const Hole &b) const {
+    int diag_steps = 0;
+    int dx = a.x - b.x, dy = a.y - b.y;
+    int adx = std::abs(dx), ady = std::abs(dy);
+    if (dx * dy < 0) {
+        diag_steps = std::min(adx, ady);
+    }
+    return adx + ady - diag_steps;
+}
+
+template<Pebble Us>
+int Board::score_by_side() const {
+    constexpr const Pebble Them = Us == P1 ? P2 : P1;
+    constexpr const Hole &our_goal   = Us == P1 ? P2_HOME : P1_HOME;
+    constexpr const Hole &their_goal = Us == P1 ? P1_HOME : P2_HOME;
+
+    int our_dist = 0, their_dist = 0;
     for (int y = 0; y < Y_SIZE; ++y) {
         for (int x = 0; x < X_SIZE; ++x) {
-            strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
+            if (_squares[y][x] == Us)
+                our_dist += dist({x, y}, our_goal);
+            else if (_squares[y][x] == Them)
+                their_dist += dist({x, y}, their_goal);
         }
-        strm << '\n';
     }
-    return strm;
+    return their_dist - our_dist;
 }
+
 

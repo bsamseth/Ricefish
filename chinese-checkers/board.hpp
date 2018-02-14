@@ -17,6 +17,9 @@ struct Hole {
     int y;
 };
 
+constexpr Hole P1_HOME = {13, 1};
+constexpr Hole P2_HOME = {5, 17};
+
 struct Direction {
     int dx;
     int dy;
@@ -58,7 +61,9 @@ public:
 
     // Score.
     int score() const;
-    int dist(const Hole &a, const Hole &b);
+    template<Pebble Us>
+    int score_by_side() const;
+    int dist(const Hole &a, const Hole &b) const;
 
     // Board perimiters.
     bool inside_board(int x, int y) const;
