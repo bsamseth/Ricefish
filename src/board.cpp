@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cmath>
+#include <iomanip>
 
 #include "board.hpp"
 
@@ -21,10 +22,21 @@ Board::Board() : _turn(P1) {
 
 std::ostream& operator<<(std::ostream &strm, const Board &b) {
     for (int y = 0; y < Y_SIZE; ++y) {
+        strm << std::setw(2) << y << "|";
         for (int x = 0; x < X_SIZE; ++x) {
             strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
         }
         strm << '\n';
+    }
+
+    // For printing the x-axis, the numbers 10 to 18 are printed
+    // using the chars after '9', as without this they would be
+    // two symbols wide and not align with the drawing of the board.
+    strm << "   ";
+    for (int x = 0; x < X_SIZE; ++x) strm << "--";
+    strm << "\n   ";
+    for (char x = 0; x < X_SIZE; ++x) {
+        strm << (char)('0'+x) << ' ';
     }
     return strm;
 }
