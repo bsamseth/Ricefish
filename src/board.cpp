@@ -144,7 +144,15 @@ int Board::score_by_side() const {
                 their_dist += dist({x, y}, their_goal);
         }
     }
-    return their_dist - our_dist;
+    //
+    if (our_dist <= 20 and their_dist <= 20)
+        return 0;  // Draw.
+    else if (our_dist <= 20)
+        return GAME_WON;  // Win.
+    else if (their_dist <= 20)
+        return -GAME_WON;  // Loss.
+    else
+        return their_dist - our_dist;
 }
 
 
