@@ -19,6 +19,21 @@ Board::Board() : _turn(P1) {
     }
 }
 
+Board::Board(std::string board_string, Pebble turn) : _turn(turn) {
+    int i = 0;
+    for (int y = 0; y < Y_SIZE; ++y) {
+        _squares[y] = { INVALID };
+        for (int x = 0; x < X_SIZE; ++x) {
+            if (inside_board(x, y)) {
+                _squares[y][x] = board_string[i] == '0' ? NO_PEBBLE
+                              : (board_string[i] == '1' ?  P1 : P2);
+                i++;
+            }
+        }
+    }
+}
+
+
 std::ostream& operator<<(std::ostream &strm, const Board &b) {
     for (int y = 0; y < Y_SIZE; ++y) {
         strm << std::setw(2) << (char)('0'+y) << "|";

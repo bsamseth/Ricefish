@@ -4,9 +4,68 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "types.hpp"
 
+const std::string INITIAL_POSITION =
+            "1"
+           "11"
+          "111"
+         "1111"
+    "0000000000000"
+    "000000000000"
+    "00000000000"
+    "0000000000"
+    "000000000"
+   "0000000000"
+  "00000000000"
+ "000000000000"
+"0000000000000"
+    "2222"
+    "222"
+    "22"
+    "2";
+
+const std::string ONE_BEST_JUMP_P1 =
+            "1"
+           "10"
+          "110"
+         "1110"
+    "0000000100000"
+    "000000100000"
+    "00000000000"
+    "0000001000"
+    "000000000"
+   "0000000000"
+  "00000000000"
+ "000000000000"
+"0000000000000"
+    "2222"
+    "222"
+    "22"
+    "2";
+
+const std::string ONE_BEST_JUMP_P2 =
+            "1"
+           "11"
+          "111"
+         "1111"
+    "0000000000000"
+    "000000000000"
+    "00000000000"
+    "0000000000"
+    "000000000"
+   "0000200000"
+  "00000000000"
+ "000002000000"
+"0000020000000"
+    "0222"
+    "022"
+    "02"
+    "2";
+
+constexpr int GAME_WON = 100000;  // A score larger than any non-won game score.
 
 class Board {
     std::array<std::array<Pebble, X_SIZE>, Y_SIZE> _squares;
@@ -15,6 +74,7 @@ class Board {
 public:
     // Constructors.
     Board();
+    Board(std::string board_string, Pebble turn = P1);
 
     // Moves.
     void do_move(const Move &move);
