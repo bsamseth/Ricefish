@@ -5,7 +5,6 @@
 #include "board.hpp"
 
 
-
 Board::Board() : _turn(P1) {
     for (int y = 0; y < Y_SIZE; ++y) {
         _squares[y] = { INVALID };
@@ -22,7 +21,7 @@ Board::Board() : _turn(P1) {
 
 std::ostream& operator<<(std::ostream &strm, const Board &b) {
     for (int y = 0; y < Y_SIZE; ++y) {
-        strm << std::setw(2) << y << "|";
+        strm << std::setw(2) << (char)('0'+y) << "|";
         for (int x = 0; x < X_SIZE; ++x) {
             strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
         }
