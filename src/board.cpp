@@ -61,15 +61,15 @@ void Board::generate_moves(std::vector<Move> &moves) {
 
             if (pebble == _turn) {
 
+                // Generate all jumps.
+                generate_jumps(from, from, moves);
+
                 // Generate all single steps.
                 for (const Direction &dir : directions_steps) {
                     Hole to = {x + dir.dx, y + dir.dy};
                     if (_squares[to.y][to.x] == NO_PEBBLE)
                         moves.push_back({from, to});
                 }
-
-                // Generate all jumps.
-                generate_jumps(from, from, moves);
             }
         }
     }
@@ -112,7 +112,7 @@ int Board::dist(const Hole &a, const Hole &b) const {
 
 template<Pebble Us>
 int Board::score_by_side() const {
-    constexpr const Pebble Them = Us == P1 ? P2 : P1;
+    constexpr const Pebble Them      = Us == P1 ? P2 : P1;
     constexpr const Hole &our_goal   = Us == P1 ? P2_HOME : P1_HOME;
     constexpr const Hole &their_goal = Us == P1 ? P1_HOME : P2_HOME;
 
