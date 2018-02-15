@@ -54,6 +54,13 @@ const std::array<Direction, 6> directions_jumps =
 };
 
 
+inline bool operator==(const Hole &lhs, const Hole &rhs) {
+    return lhs.x == rhs.x and lhs.y == rhs.y;
+}
+
+inline bool operator==(const Move &lhs, const Move &rhs) {
+    return lhs.from == rhs.from and lhs.to == rhs.to;
+}
 
 inline std::ostream& operator<<(std::ostream &strm, const Hole &b) {
     return strm << "(" << b.x << ", " << b.y << ")";
