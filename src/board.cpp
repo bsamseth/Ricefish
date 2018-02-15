@@ -94,6 +94,10 @@ void Board::generate_jumps(const Hole &origin,
     _squares[from.y][from.x] = original;
 }
 
+int Board::score_absolute(int score) const {
+    return _turn == P1 ? score : -score;
+}
+
 int Board::score() const {
     return _turn == P1 ?  score_by_side<P1>()
                         : score_by_side<P2>();

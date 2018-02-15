@@ -28,6 +28,7 @@ public:
     int score() const;
     template<Pebble Us>
     int score_by_side() const;
+    int score_absolute(int score) const;
     int dist(const Hole &a, const Hole &b) const;
 
     // Board perimiters.
