@@ -6,11 +6,28 @@
 //  Copyright © 2018 Bendik Samseth. All rights reserved.
 //
 
+#include <cassert>
+#include <chrono>
+
 #include "search.hpp"
 
-SearchResult search(Board &board, int max_depth) {
+SearchResult search(Board &board, int secs) {
+    auto start_time = std::chrono::steady_clock::now();
+
     SearchResult result;
-    for (int depth = 0; depth <= max_depth; ++depth) {
+    int depth = 1;
+    do {
+        result = negamax_pruned(board, depth++);
+    } while (std::chrono::duration_cast<
+                std::chrono::seconds>
+             (std::chrono::steady_clock::now() - start_time)
+             .count() < secs);
+    return result;
+}
+
+SearchResult search(Board &board) {
+    SearchResult result;
+    for (int depth = 1; depth <= 4; ++depth) {
         result = negamax_pruned(board, depth);
         std::cout << " info depth " << depth << " " << result << std::endl;
     }

@@ -8,20 +8,17 @@
 
 #include <iostream>
 #include "board.hpp"
+#include "search.hpp"
+#include "interface.hpp"
 
 using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-    Board board;
-    cout << "Initial score: " << board.score() << endl;
-    std::vector<Move> moves;
-    board.generate_moves(moves);
-    for (const Move &move : moves) {
-        board.do_move(move);
-        cout << board << endl;
-        cout << "score: " << board.score() << endl;
-        board.undo_move(move);
-    }
+    Board board(INITIAL_POSITION);
+    //search(board);
+    cout << board.score() << endl;
+    cout << board << endl;
+    self_play();
     return 0;
 }

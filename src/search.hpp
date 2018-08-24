@@ -19,7 +19,9 @@ struct SearchResult {
     Move move;
 };
 
-SearchResult search(Board &board, int max_depth);
+SearchResult search(Board &board, int secs);
+
+SearchResult search(Board &board);
 
 SearchResult negamax_pruned(Board &board,
                             int depth,

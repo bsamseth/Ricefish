@@ -1,1 +1,3 @@
 chinese-checkers.xcodeproj
+.idea
+cmake-build-*
