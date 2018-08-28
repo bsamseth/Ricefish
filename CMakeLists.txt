@@ -83,9 +83,9 @@ add_library( engine ${SOURCES} ${HEADERS} )
 
 # Add an executable for the file main.cpp, here called main.x.
 # If you add more executables, copy these three lines accordingly.
-add_executable(main.x app/main.cpp)   # Name of exec. and location of file.
-add_dependencies(main.x engine)       # main.cpp uses the 'engine', add dep.
-target_link_libraries(main.x engine)  # Link the executable to the 'engine'.
+add_executable(ricefish.x app/main.cpp)   # Name of exec. and location of file.
+add_dependencies(ricefish.x engine)       # main.cpp uses the 'engine', add dep.
+target_link_libraries(ricefish.x engine pthread)  # Link the executable to the 'engine'.
 
 
 
