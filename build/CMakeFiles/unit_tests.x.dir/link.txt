@@ -1,0 +1,1 @@
+/usr/local/bin/g++   -std=c++14 -Wall -Wextra -g -O0 -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/unit_tests.x.dir/tests/dummy.cpp.o CMakeFiles/unit_tests.x.dir/tests/main.cpp.o  -o unit_tests.x libgoogletest.a libengine.a -lpthread 

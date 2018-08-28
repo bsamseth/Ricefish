@@ -4,41 +4,29 @@
 
 #include "board.hpp"
 
-
-Board::Board() : _turn(P1) {
-    for (int y = 0; y < Y_SIZE; ++y) {
-        _squares[y] = { INVALID };
-        for (int x = 0; x < X_SIZE; ++x) {
-            if (inside_P1(x, y))
-                _squares[y][x] = P1;
-            else if (inside_P2(x, y))
-                _squares[y][x] = P2;
-            else if (inside_board(x, y))
-                _squares[y][x] = NO_PEBBLE;
-        }
-    }
-}
+namespace ricefish {
 
 Board::Board(std::string board_string, Pebble turn) : _turn(turn) {
     int i = 0;
     for (int y = 0; y < Y_SIZE; ++y) {
-        _squares[y] = { INVALID };
         for (int x = 0; x < X_SIZE; ++x) {
-            if (inside_board(x, y)) {
-                _squares[y][x] = board_string[i] == '0' ? NO_PEBBLE
-                              : (board_string[i] == '1' ?  P1 : P2);
+            if (inside_board(y, x)) {
+                (*this)(y, x) = board_string[i] == '0' ? Pebble::NO_PEBBLE
+                                                       : (board_string[i] == '1' ? Pebble::P1 : Pebble::P2);
                 i++;
+            } else {
+                (*this)(y, x) = Pebble::INVALID;
             }
         }
     }
 }
 
 
-std::ostream& operator<<(std::ostream &strm, const Board &b) {
+std::ostream &operator<<(std::ostream &strm, const Board &b) {
     for (int y = 0; y < Y_SIZE; ++y) {
-        strm << std::setw(2) << (char)('0'+y) << "|";
+        strm << std::setw(2) << (char) ('0' + y) << "|";
         for (int x = 0; x < X_SIZE; ++x) {
-            strm << PEBBLE_CHAR[b._squares[y][x]] << ' ';
+            strm << Pebbles::get_char(b(y, x)) << ' ';
         }
         strm << '\n';
     }
@@ -50,80 +38,56 @@ std::ostream& operator<<(std::ostream &strm, const Board &b) {
     for (int x = 0; x < X_SIZE; ++x) strm << "--";
     strm << "\n   ";
     for (char x = 0; x < X_SIZE; ++x) {
-        strm << (char)('0'+x) << ' ';
+        strm << (char) ('0' + x) << ' ';
     }
     return strm;
 }
 
-void Board::do_move(const Move &move) {
-    assert(_squares[move.from.y][move.from.x] == _turn);
-    _squares[move.to.y][move.to.x] = _squares[move.from.y][move.from.x];
-    _squares[move.from.y][move.from.x] = NO_PEBBLE;
-    _turn = swap(_turn);
+void Board::make_move(const Move &move) {
+    assert((*this)(move.from) == _turn);
+    (*this)(move.to) = (*this)(move.from);
+    (*this)(move.from) = Pebble::NO_PEBBLE;
+    _turn = ~_turn;
 }
 
 void Board::undo_move(const Move &move) {
-    _turn = swap(_turn);
-    _squares[move.from.y][move.from.x] = _turn;
-    _squares[move.to.y][move.to.x] = NO_PEBBLE;
+    _turn = ~_turn;
+    (*this)(move.from) = _turn;
+    (*this)(move.to) = Pebble::NO_PEBBLE;
 }
 
-void Board::generate_moves(std::vector<Move> &moves) {
-    for (int y = 0; y < Y_SIZE; ++y) {
-        for (int x = 0; x < X_SIZE; ++x) {
-            Hole from = {x, y};
-            Pebble &pebble = _squares[y][x];
-
-            if (pebble == _turn) {
-
-                // Generate all jumps.
-                generate_jumps(from, from, moves);
-
-                // Generate all single steps.
-                for (const Direction &dir : directions_steps) {
-                    Hole to = {x + dir.dx, y + dir.dy};
-                    if (_squares[to.y][to.x] == NO_PEBBLE)
-                        moves.push_back({from, to});
-                }
-            }
-        }
+Pebble Board::get_winner() const {
+    int p1_count = 0;
+    int p2_count = 0;
+    for (const Hole& hole : Holes::valid_holes) {
+        const auto p = (*this)(hole);
+        if (p == Pebble::P1)
+            p1_count += inside_P2(hole.y, hole.x);
+        else if (p == Pebble::P2)
+            p2_count += inside_P1(hole.y, hole.x);
     }
-}
-
-void Board::generate_jumps(const Hole &origin,
-                           const Hole &from,
-                           std::vector<Move> &moves) {
-    const Pebble original = _squares[from.y][from.x];
-    _squares[from.y][from.x] = _turn;
-
-    for (const Direction &dir : directions_steps) {
-        Hole over = {from.x +     dir.dx, from.y +     dir.dy};
-        Hole to   = {from.x + 2 * dir.dx, from.y + 2 * dir.dy};
-        if (    _squares[over.y][over.x] != NO_PEBBLE
-            and _squares[over.y][over.x] != INVALID
-            and _squares[to.y][to.x] == NO_PEBBLE) {
-            moves.push_back({origin, to});
-            generate_jumps(origin, to, moves);
-        }
-    }
-    _squares[from.y][from.x] = original;
+    if (p1_count == 10)
+        return Pebble::P1;
+    else if (p2_count == 10)
+        return Pebble::P2;
+    else
+        return Pebble::NO_PEBBLE;
 }
 
 int Board::score_absolute(int score) const {
-    return _turn == P1 ? score : -score;
+    return _turn == Pebble::P1 ? score : -score;
 }
 
 int Board::score() const {
-    return _turn == P1 ?  score_by_side<P1>()
-                        : score_by_side<P2>();
+    return _turn == Pebble::P1 ? score_by_side<Pebble::P1>()
+                       : score_by_side<Pebble::P2>();
 }
 
-
-int Board::dist(const Hole &a, const Hole &b) const {
+int Board::dist(const Hole &a, const Hole &b) {
     int diag_steps = 0;
-    int dx = a.x - b.x, dy = a.y - b.y;
-    int adx = std::abs(dx), ady = std::abs(dy);
-    if (dx * dy < 0) {
+    Hole delta = a - b;
+    int adx = std::abs(delta.x), ady = std::abs(delta.y);
+    if (delta.x * delta.y < 0) {
         diag_steps = std::min(adx, ady);
     }
     return adx + ady - diag_steps;
@@ -131,28 +95,26 @@ int Board::dist(const Hole &a, const Hole &b) const {
 
 template<Pebble Us>
 int Board::score_by_side() const {
-    constexpr const Pebble Them      = Us == P1 ? P2 : P1;
-    constexpr const Hole &our_goal   = Us == P1 ? P2_HOME : P1_HOME;
-    constexpr const Hole &their_goal = Us == P1 ? P1_HOME : P2_HOME;
+    constexpr const Pebble Them = ~Us;
+    constexpr const Hole &our_goal = Us == Pebble::P1 ? Holes::P2_HOME : Holes::P1_HOME;
+    constexpr const Hole &their_goal = Us == Pebble::P1 ? Holes::P1_HOME : Holes::P2_HOME;
 
     int our_dist = 0, their_dist = 0;
-    for (int y = 0; y < Y_SIZE; ++y) {
-        for (int x = 0; x < X_SIZE; ++x) {
-            if (_squares[y][x] == Us)
-                our_dist += dist({x, y}, our_goal);
-            else if (_squares[y][x] == Them)
-                their_dist += dist({x, y}, their_goal);
-        }
+    for (const Hole& hole : Holes::valid_holes) {
+        if ((*this)(hole) == Us)
+            our_dist += dist(hole, our_goal);
+        else if ((*this)(hole) == Them)
+            their_dist += dist(hole, their_goal);
     }
     //
     if (our_dist <= 20 and their_dist <= 20)
         return 0;  // Draw.
     else if (our_dist <= 20)
-        return GAME_WON;  // Win.
+        return Value::MATE;  // Win.
     else if (their_dist <= 20)
-        return -GAME_WON;  // Loss.
+        return -Value::MATE;  // Loss.
     else
         return their_dist - our_dist;
 }
 
-
+}
