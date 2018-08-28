@@ -1,2 +1,0 @@
-/usr/bin/ar qc libengine.a  CMakeFiles/engine.dir/src/board.cpp.o CMakeFiles/engine.dir/src/interface.cpp.o CMakeFiles/engine.dir/src/search.cpp.o
-/usr/bin/ranlib libengine.a
