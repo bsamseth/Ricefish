@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bsamseth/chinese-checkers.svg?branch=master)](https://travis-ci.org/bsamseth/chinese-checkers)
+[![Build Status](https://travis-ci.org/bsamseth/ricefish.svg?branch=master)](https://travis-ci.org/bsamseth/ricefish)
 [![Coverage Status](https://coveralls.io/repos/github/bsamseth/ricefish/badge.svg?branch=master)](https://coveralls.io/github/bsamseth/ricefish?branch=master)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/bsamseth/ricefish/blob/master/LICENCE)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
