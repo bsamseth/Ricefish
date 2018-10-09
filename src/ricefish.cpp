@@ -36,7 +36,9 @@ void Ricefish::run() {
             receive_ponder_hit();
         } else if (token == "print") {
             receive_print();
-        }else if (token == "quit") {
+        } else if (token == "string") {
+            receive_string();
+        } else if (token == "quit") {
             receive_quit();
             break;
         }
@@ -94,24 +96,23 @@ void Ricefish::receive_position(std::istringstream &input) {
 
         if (input >> token) {
             if (token != "moves") {
-                throw std::exception();
+                throw std::invalid_argument("Unrecognized command: " + token);
             }
         }
     } else if (token == "fen") {
-        throw std::invalid_argument("FEN not supported for this game. Use startpos moves.");
-//        std::string fen;
-//
-//        while (input >> token) {
-//            if (token == "moves") {
-//                break;
-//            } else {
-//                fen += token + " ";
-//            }
-//        }
-//
-//        *current_position = Notation::to_position(fen);
+        std::string fen;
+
+        while (input >> token) {
+            if (token == "moves") {
+                break;
+            } else {
+                fen += token + " ";
+            }
+        }
+
+        *current_position = Board(fen);
     } else {
-        throw std::exception();
+        throw std::invalid_argument("Bad position command.");
     }
 
     MoveGenerator move_generator;
@@ -122,7 +123,9 @@ void Ricefish::receive_position(std::istringstream &input) {
         bool found = false;
         for (const auto& e : moves) {
             Move move = e->move;
-            if (from_move(move) == token) {
+            std::stringstream move_string;
+            move_string << move;
+            if (move_string.str() == token) {
                 current_position->make_move(move);
                 found = true;
                 break;
@@ -130,7 +133,7 @@ void Ricefish::receive_position(std::istringstream &input) {
         }
 
         if (!found) {
-            throw std::exception();
+            throw std::invalid_argument("Suggested move is not legal: " + token + " position " + current_position->to_string());
         }
     }
 
@@ -149,7 +152,7 @@ void Ricefish::receive_go(std::istringstream &input) {
         if (input >> search_depth) {
             search->new_depth_search(*current_position, search_depth);
         } else {
-            throw std::exception();
+            throw std::invalid_argument("Missing depth parameter.");
         }
     } else if (token == "nodes") {
         uint64_t search_nodes;
@@ -174,23 +177,23 @@ void Ricefish::receive_go(std::istringstream &input) {
         do {
             if (token == "wtime") {
                 if (!(input >> white_time_left)) {
-                    throw std::exception();
+                    throw std::invalid_argument("Missing wtime parameter.");
                 }
             } else if (token == "winc") {
                 if (!(input >> white_time_increment)) {
-                    throw std::exception();
+                    throw std::invalid_argument("Missing winc parameter.");
                 }
             } else if (token == "btime") {
                 if (!(input >> black_time_left)) {
-                    throw std::exception();
+                    throw std::invalid_argument("Missing btime parameter.");
                 }
             } else if (token == "binc") {
                 if (!(input >> black_time_increment)) {
-                    throw std::exception();
+                    throw std::invalid_argument("Missing binc parameter.");
                 }
             } else if (token == "movestogo") {
                 if (!(input >> search_moves_toGo)) {
-                    throw std::exception();
+                    throw std::invalid_argument("Missing movestogo parameter.");
                 }
             } else if (token == "ponder") {
                 ponder = true;
@@ -300,15 +303,16 @@ void Ricefish::send_move(RootEntry entry, int current_depth, int current_max_dep
 
 std::string Ricefish::from_move(const Move& move) {
     std::stringstream ss;
-
-    ss << "(" << move.from.y << "," << move.from.x << "),";
-    ss << "(" << move.to.y << "," << move.to.x << ")";
-
+    ss << move;
     return ss.str();
 }
 
 void Ricefish::receive_print() {
     std::cout << *current_position << std::endl;
+}
+
+void Ricefish::receive_string() {
+    std::cout << current_position->to_string() << std::endl;
 }
 
 }

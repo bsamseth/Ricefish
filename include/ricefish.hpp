@@ -49,6 +49,8 @@ private:
 
     void receive_print();
 
+    void receive_string();
+
     void receive_quit();
 
 };
