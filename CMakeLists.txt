@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Set project name here.
-project(CPP_BOILERPLATE)
+project(Ricefish)
 enable_language(C CXX)
 
 # Set version number (change as needed). These definitions are available
