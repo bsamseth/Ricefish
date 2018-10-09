@@ -8,10 +8,9 @@
 
 
 This is a "UCI" Chinese checkers engine. UCI is normally the _Universal Chess Interface_. This interface is implemented 
-exactly the same as for regular chess, with some notable exception:
+exactly the same as for regular chess, with some notable exception(s):
 
-- Moves are encoded as `(from.row,from.col),(to.row,to.col)`, with no spaces. In chess you would say e.g. `e2e4`, but here you say e.g. `(13,5),(5,13)`.
-- There is currently no support for specifying a position directly (like with FEN notation in chess). You specify a position by the starting position and the subsequent moves. This will likely be implemented sometime soon(ish).
+- Moves are encoded as `AaBb`, with no spaces, indicating a move from row `A` column `a` to row `B` column `b`.
 
 
 The current version is based heavily on
@@ -36,9 +35,20 @@ directory: `ricefish` and `unit_tests.x`. The former is the interface to the
 engine it self.
 
 ## Run
+A _simple_ playing script is available to make this easier, see/run [play-match.py](play-match.py).
 
-You can play using the UCI interface directly, although this is a bit tedious. A playing script is in the works.
-For now, here's a short example of how to play with the engine (lines starting with `>` are the commands entered):
+```text
+usage: play-match.py [-h] --engine ENGINE (--human | --self-play)
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --engine ENGINE  Path to engine executable, i.e. `build/ricefish.x`
+  --human          Specify to play as a human against the computer.
+  --self-play      Specify to play the computer against it self.
+```
+
+You can play using the UCI interface directly, although this is a bit tedious. 
+Here's a short example of how to play with the engine (lines starting with `>` are the commands entered):
 
 ``` text
 terminal $ build/ricefish.x
@@ -50,94 +60,92 @@ uciok
 readyok
 > position startpos
 > print
- 0|
- 1|                          x
- 2|                        x x
- 3|                      x x x
- 4|                    x x x x
- 5|          . . . . . . . . . . . . .
- 6|          . . . . . . . . . . . .
- 7|          . . . . . . . . . . .
- 8|          . . . . . . . . . .
- 9|          . . . . . . . . .
- :|        . . . . . . . . . .
- ;|      . . . . . . . . . . .
- <|    . . . . . . . . . . . .
- =|  . . . . . . . . . . . . .
- >|          + + + +
- ?|          + + +
- @|          + +
- A|          +
- B|
+ A|
+ B|                          x
+ C|                        x x
+ D|                      x x x
+ E|                    x x x x
+ F|          . . . . . . . . . . . . .
+ G|          . . . . . . . . . . . .
+ H|          . . . . . . . . . . .
+ I|          . . . . . . . . . .
+ J|          . . . . . . . . .
+ K|        . . . . . . . . . .
+ L|      . . . . . . . . . . .
+ M|    . . . . . . . . . . . .
+ N|  . . . . . . . . . . . . .
+ O|          + + + +
+ P|          + + +
+ Q|          + +
+ R|          +
+ S|
    --------------------------------------
-   0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B
-> go movetime 3000
-info depth 1 seldepth 0 nodes 0 time 1538727497146 nps 0
-info depth 1 seldepth 1 nodes 2 time 0 nps 0 score cp 2 pv (3,11),(5,11)
-info depth 2 seldepth 2 nodes 31 time 0 nps 0 score cp 0 pv (3,11),(5,11) (15,5),(13,5)
-info depth 3 seldepth 3 nodes 113 time 0 nps 0 score cp 4 pv (3,11),(5,11) (15,5),(13,5) (1,13),(5,9)
-info depth 4 seldepth 4 nodes 898 time 1 nps 0 score cp 0 pv (3,11),(5,11) (15,5),(13,5) (1,13),(5,9) (17,5),(13,7)
-info depth 5 seldepth 5 nodes 6305 time 8 nps 0 score cp 3 pv (3,11),(5,11) (15,5),(13,5) (5,11),(6,11) (17,5),(13,7) (1,13),(7,11)
-info depth 6 seldepth 6 nodes 86471 time 82 nps 0 score cp 0 pv (3,11),(5,11) (15,5),(13,5) (5,11),(6,11) (13,5),(12,5) (1,13),(7,11) (17,5),(11,5)
-info depth 7 seldepth 7 nodes 650297 time 526 nps 0 score cp 4 pv (3,11),(5,11) (15,5),(13,5) (4,11),(5,10) (13,5),(12,5) (2,13),(6,9) (17,5),(11,5) (1,13),(7,9)
-info depth 8 seldepth 8 nodes 1990626 time 1526 nps 1304473 currmove (3,11),(5,11) currmovenumber 1
-info depth 8 seldepth 8 nodes 2972413 time 2526 nps 1176727 currmove (3,11),(5,11) currmovenumber 1
-info depth 8 seldepth 8 nodes 3479826 time 3005 nps 1158011 currmove (3,11),(5,11) currmovenumber 1
-bestmove (3,11),(5,11) ponder (15,5),(13,5)
-> position startpos moves (3,11),(5,11)
+   a b c d e f g h i j k l m n o p q r s
+> go movetime 100
+info depth 1 seldepth 0 nodes 0 time 1539122989870 nps 0
+info depth 1 seldepth 1 nodes 2 time 0 nps 0 score cp 2 pv DlFl
+info depth 2 seldepth 2 nodes 31 time 1 nps 0 score cp 0 pv DlFl PfNf
+info depth 3 seldepth 3 nodes 113 time 3 nps 0 score cp 4 pv DlFl PfNf BnFj
+info depth 4 seldepth 4 nodes 898 time 10 nps 0 score cp 0 pv DlFl PfNf BnFj RfNh
+info depth 5 seldepth 5 nodes 6305 time 76 nps 0 score cp 3 pv DlFl PfNf FlGl RfNh BnHl
+info depth 5 seldepth 5 nodes 10541 time 101 nps 0 currmove DnFn currmovenumber 5
+bestmove DlFl ponder PfNf
+> position startpos moves DlFl PfNf
 > print
- 0|
- 1|                          x
- 2|                        x x
- 3|                      . x x
- 4|                    x x x x
- 5|          . . . . . . x . . . . . .
- 6|          . . . . . . . . . . . .
- 7|          . . . . . . . . . . .
- 8|          . . . . . . . . . .
- 9|          . . . . . . . . .
- :|        . . . . . . . . . .
- ;|      . . . . . . . . . . .
- <|    . . . . . . . . . . . .
- =|  . . . . . . . . . . . . .
- >|          + + + +
- ?|          + + +
- @|          + +
- A|          +
- B|
+ A|
+ B|                          x
+ C|                        x x
+ D|                      . x x
+ E|                    x x x x
+ F|          . . . . . . x . . . . . .
+ G|          . . . . . . . . . . . .
+ H|          . . . . . . . . . . .
+ I|          . . . . . . . . . .
+ J|          . . . . . . . . .
+ K|        . . . . . . . . . .
+ L|      . . . . . . . . . . .
+ M|    . . . . . . . . . . . .
+ N|  . . . . + . . . . . . . .
+ O|          + + + +
+ P|          . + +
+ Q|          + +
+ R|          +
+ S|
    --------------------------------------
-   0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B
-> go movetime 1000
-info depth 1 seldepth 0 nodes 0 time 32077 nps 0
-info depth 1 seldepth 1 nodes 2 time 0 nps 0 score cp 0 pv (15,5),(13,5)
-info depth 2 seldepth 2 nodes 44 time 0 nps 0 score cp -4 pv (15,5),(13,5) (1,13),(5,9)
-info depth 3 seldepth 3 nodes 153 time 0 nps 0 score cp 0 pv (15,5),(13,5) (1,13),(5,9) (17,5),(13,7)
-info depth 4 seldepth 4 nodes 2059 time 2 nps 0 score cp -3 pv (15,5),(13,5) (5,11),(6,11) (17,5),(13,7) (1,13),(7,11)
-info depth 5 seldepth 5 nodes 14948 time 15 nps 0 score cp 0 pv (15,5),(13,5) (5,11),(6,11) (13,5),(12,5) (1,13),(7,11) (17,5),(11,5)
-info depth 6 seldepth 6 nodes 179022 time 140 nps 0 score cp -4 pv (15,5),(13,5) (4,11),(5,10) (13,5),(12,5) (2,13),(6,9) (17,5),(11,5) (1,13),(7,9)
-info depth 7 seldepth 7 nodes 1103351 time 1003 nps 1100050 currmove (15,5),(13,5) currmovenumber 1
-bestmove (15,5),(13,5) ponder (4,11),(5,10)
-> position startpos moves (3,11),(5,11) (15,5),(13,5)
+   a b c d e f g h i j k l m n o p q r s
+> string
+1110111111000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000002222022222 x
+> position fen 1110111111000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000002222022222 x
 > print
- 0|
- 1|                          x
- 2|                        x x
- 3|                      . x x
- 4|                    x x x x
- 5|          . . . . . . x . . . . . .
- 6|          . . . . . . . . . . . .
- 7|          . . . . . . . . . . .
- 8|          . . . . . . . . . .
- 9|          . . . . . . . . .
- :|        . . . . . . . . . .
- ;|      . . . . . . . . . . .
- <|    . . . . . . . . . . . .
- =|  . . . . + . . . . . . . .
- >|          + + + +
- ?|          . + +
- @|          + +
- A|          +
- B|
+ A|
+ B|                          x
+ C|                        x x
+ D|                      . x x
+ E|                    x x x x
+ F|          . . . . . . x . . . . . .
+ G|          . . . . . . . . . . . .
+ H|          . . . . . . . . . . .
+ I|          . . . . . . . . . .
+ J|          . . . . . . . . .
+ K|        . . . . . . . . . .
+ L|      . . . . . . . . . . .
+ M|    . . . . . . . . . . . .
+ N|  . . . . + . . . . . . . .
+ O|          + + + +
+ P|          . + +
+ Q|          + +
+ R|          +
+ S|
    --------------------------------------
-   0 1 2 3 4 5 6 7 8 9 : ; < = > ? @ A B
-```
+   a b c d e f g h i j k l m n o p q r s
+> go depth 5  # Depth limited search.
+info depth 1 seldepth 0 nodes 0 time 25566 nps 0
+info depth 1 seldepth 1 nodes 2 time 0 nps 0 score cp 4 pv BnFj
+info depth 2 seldepth 2 nodes 58 time 0 nps 0 score cp 0 pv BnFj RfNh
+info depth 3 seldepth 3 nodes 240 time 4 nps 0 score cp 2 pv BnFj RfNh DmFi
+info depth 3 seldepth 3 nodes 1524 time 14 nps 0 score cp 3 pv FlGl RfNh BnHl
+info depth 4 seldepth 4 nodes 2782 time 25 nps 0 score cp 0 pv FlGl NfMf BnHl RfLf
+info depth 5 seldepth 5 nodes 13490 time 133 nps 0 score cp 4 pv FlGl NfMf BnHl RfLf DmHk
+info depth 5 seldepth 5 nodes 84306 time 543 nps 0 currmove FlGk currmovenumber 27
+bestmove FlGl ponder NfMf
+> go infinite  # Search until stopped.
