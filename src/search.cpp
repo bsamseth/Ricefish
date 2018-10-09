@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdint-gcc.h>
+#include <cstdlib>
 
 #include "search.hpp"
 
@@ -57,8 +57,8 @@ void Search::Semaphore::drain_permits() {
 }
 
 void Search::new_depth_search(Board &position, int search_depth) {
-    if (search_depth < 1 || search_depth > Depth::MAX_DEPTH) throw std::exception();
-    if (running) throw std::exception();
+    if (search_depth < 1 || search_depth > Depth::MAX_DEPTH) throw std::invalid_argument("Depth must be >= 1 and <= MAX_DEPTH");
+    if (running) throw std::logic_error("Already running.");
 
     reset();
 
@@ -67,8 +67,8 @@ void Search::new_depth_search(Board &position, int search_depth) {
 }
 
 void Search::new_nodes_search(Board &position, uint64_t search_nodes) {
-    if (search_nodes < 1) throw std::exception();
-    if (running) throw std::exception();
+    if (search_nodes < 1) throw std::invalid_argument("Nodes mus be >= 1");
+    if (running) throw std::logic_error("Already running.");
 
     reset();
 
@@ -77,8 +77,8 @@ void Search::new_nodes_search(Board &position, uint64_t search_nodes) {
 }
 
 void Search::new_time_search(Board &position, uint64_t search_time) {
-    if (search_time < 1) throw std::exception();
-    if (running) throw std::exception();
+    if (search_time < 1) throw std::invalid_argument("Time must be >= 1");
+    if (running) throw std::logic_error("Already running.");
 
     reset();
 
@@ -88,7 +88,7 @@ void Search::new_time_search(Board &position, uint64_t search_time) {
 }
 
 void Search::new_infinite_search(Board &position) {
-    if (running) throw std::exception();
+    if (running) throw std::logic_error("Already running.");
 
     reset();
 
@@ -108,10 +108,10 @@ void Search::new_clock_search(Board &position,
 void Search::new_ponder_search(Board &position,
                                uint64_t white_time_left, uint64_t white_time_increment, uint64_t black_time_left,
                                uint64_t black_time_increment, int moves_to_go) {
-    if (white_time_left < 1) throw std::exception();
-    if (black_time_left < 1) throw std::exception();
-    if (moves_to_go < 0) throw std::exception();
-    if (running) throw std::exception();
+    if (white_time_left < 1) throw std::invalid_argument("Time must be >= 1");
+    if (black_time_left < 1) throw std::invalid_argument("Time must be >= 1");
+    if (moves_to_go < 0) throw std::invalid_argument("Remaining moves must be >= 0");
+    if (running) throw std::logic_error("Already running.");
 
     reset();
 
@@ -269,6 +269,11 @@ void Search::run() {
             // best move first.
             root_moves.sort();
 
+            if (std::abs(root_moves.entries[0]->value) >= Value::MATE) {
+                // A mate was found, no need to search deeper.
+                break;
+            }
+
             check_stop_conditions();
 
             if (abort) {
@@ -358,6 +363,11 @@ void Search::search_root(int depth, int alpha, int beta) {
 
 
     for (int i = 0; i < root_moves.size; i++) {
+        if (alpha >= Value::MATE) {
+            // We have already found a mate at a shorter depth.
+            // Then there is no need to go on, just stop here.
+            break;
+        }
         Move move = root_moves.entries[i]->move;
 
         current_move = move;
@@ -443,8 +453,10 @@ int Search::search(int depth, int alpha, int beta, int ply) {
     }
 
     if (searched_moves == 0) {
-        // We have a stale mate. Return the draw value.
-        return Value::DRAW;
+        // In chess this would potentially indicate a stale mate. This cannot
+        // happen in two-player chinese checkers, and we only get here if we have no
+        // legal moves, i.e. the opponent has already won.
+        return -Value::MATE;
     }
 
     return best_value;
