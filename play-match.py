@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import argparse
 import pexpect
 import os
 import time
@@ -141,10 +142,19 @@ def human_play(engine, human_starts=True, movetime=500):
 
 
 if __name__ == "__main__":
-    build_dir = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "build-release"
-    )
-    exec_path = os.path.join(build_dir, "ricefish.x")
-    with ChineseCheckersEngine(exec_path, "logfile.log") as engine:
-        # self_play(engine, movetime=500)
-        human_play(engine)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--engine', required=True,
+            help='Path to engine executable, i.e. `build/ricefish.x`')
+    play_mode = parser.add_mutually_exclusive_group(required=True)
+    play_mode.add_argument('--human', action='store_true',
+            help='Specify to play as a human against the computer.')
+    play_mode.add_argument('--self-play', action='store_true',
+            help='Specify to play the computer against it self.')
+    args = parser.parse_args()
+
+    with ChineseCheckersEngine(args.engine, "logfile.log") as engine:
+        if args.human:
+            human_play(engine)
+        else:
+            self_play(engine, movetime=500)
+
