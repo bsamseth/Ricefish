@@ -14,4 +14,10 @@ TEST(Hole, test_addition_subtraction) {
     ASSERT_EQ(c - b, a);
 }
 
+TEST(Hole, to_string) {
+    std::stringstream ss;
+    ss << Hole{0, 1};
+    ASSERT_STREQ("Ab", ss.str().c_str());
+}
+
 }

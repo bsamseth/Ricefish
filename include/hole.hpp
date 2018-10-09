@@ -25,7 +25,7 @@ inline Hole operator- (const Hole& a, const Hole& b) {
     return {a.y - b.y, a.x - b.x};
 }
 inline std::ostream& operator<< (std::ostream& strm, const Hole& b) {
-    return strm << '(' << b.y << ", " << b.x << ")";
+    return strm << (char)('A' + b.y) << (char)('a' + b.x);
 }
 
 namespace Holes {

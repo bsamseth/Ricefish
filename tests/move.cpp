@@ -21,4 +21,11 @@ TEST(move, test_equality) {
     ASSERT_EQ(b, b);
 }
 
+TEST(move, to_string) {
+    Move a {{0, 1}, {2, 3}};
+    std::stringstream ss;
+    ss << a;
+    ASSERT_STREQ("AbCd", ss.str().c_str());
+}
+
 }

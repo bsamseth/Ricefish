@@ -16,7 +16,7 @@ inline bool operator!= (const Move& a, const Move& b) {
     return !(a == b);
 }
 inline std::ostream& operator<<(std::ostream &strm, const Move &m) {
-    return strm << "[" << m.from << " -> " << m.to << "]";
+    return strm << m.from << m.to;
 }
 
 namespace Moves {
