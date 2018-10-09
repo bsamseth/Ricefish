@@ -93,9 +93,7 @@ TEST(Board, test_simple_scores) {
     ASSERT_EQ(Value::DRAW, b.score());
 
     // The opposite of the initial position is also a draw (both players done).
-    std::string END_POSITION = std::string(Positions::INITIAL_POSITION);
-    std::reverse(END_POSITION.begin(), END_POSITION.end());
-    b = Board{END_POSITION, Pebble::P2};
+    b = Board{Positions::END_POSITION};
     ASSERT_EQ(Value::DRAW, b.score());
 
     // (Un)Making one move for P2 results in a winning position for P1.

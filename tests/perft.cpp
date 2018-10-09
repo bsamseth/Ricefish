@@ -13,14 +13,13 @@ struct Entry {
 
 struct P {
     std::string pos_string;
-    Pebble turn;
     std::vector<Entry> perft_entries;
-    P(std::string str, Pebble turn, std::initializer_list<Entry> perft_entries) : pos_string(str), turn(turn), perft_entries(perft_entries) {}
+    P(std::string str, std::initializer_list<Entry> perft_entries) : pos_string(str), perft_entries(perft_entries) {}
 };
 
 // TODO: Add more perft positions.
 const std::vector<P> perft_positions = {
-       P{Positions::INITIAL_POSITION, Pebble::P1, {Entry{1, 14}, Entry{2, 14*14}}},
+       P{Positions::INITIAL_POSITION, {Entry{1, 14}, Entry{2, 14*14}}},
 };
 
 
@@ -49,7 +48,7 @@ TEST(Perft, test_inside) {
 
     for (const auto& p : perft_positions) {
         for (const auto& e : p.perft_entries) {
-            Board b(p.pos_string, p.turn);
+            Board b(p.pos_string);
 
             auto result = mini_max(e.depth, b);
 

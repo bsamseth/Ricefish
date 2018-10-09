@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <string>
+#include <sstream>
 
 #include "pebble.hpp"
 #include "hole.hpp"
@@ -31,7 +33,30 @@ const std::string INITIAL_POSITION =
         "2222"
         "222"
         "22"
-        "2";
+        "2"
+        " "
+        "x";
+
+const std::string END_POSITION =
+        "2"
+        "22"
+        "222"
+        "2222"
+        "0000000000000"
+        "000000000000"
+        "00000000000"
+        "0000000000"
+        "000000000"
+        "0000000000"
+        "00000000000"
+        "000000000000"
+        "0000000000000"
+        "1111"
+        "111"
+        "11"
+        "1"
+        " "
+        "+";
 
 const std::string ONE_BEST_JUMP_P1 =
         "1"
@@ -50,7 +75,9 @@ const std::string ONE_BEST_JUMP_P1 =
         "2222"
         "222"
         "22"
-        "2";
+        "2"
+        " "
+        "x";
 
 const std::string ONE_BEST_JUMP_P2 =
         "1"
@@ -69,7 +96,9 @@ const std::string ONE_BEST_JUMP_P2 =
         "0222"
         "022"
         "02"
-        "2";
+        "2"
+        " "
+        "+";
 }
 
 constexpr int X_SIZE = 19, Y_SIZE = 19;
@@ -80,7 +109,10 @@ class Board {
 
 public:
     // Ctor
-    Board(std::string board_string = Positions::INITIAL_POSITION, Pebble turn = Pebble::P1);
+    explicit Board(const std::string &board_string = Positions::INITIAL_POSITION);
+
+    // String rep.
+    std::string to_string() const;
 
     // Moves.
     void make_move(const Move &move);

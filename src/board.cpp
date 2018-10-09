@@ -1,12 +1,24 @@
 #include <cassert>
 #include <cmath>
 #include <iomanip>
+#include <string>
+#include <sstream>
 
 #include "board.hpp"
 
+
 namespace ricefish {
 
-Board::Board(std::string board_string, Pebble turn) : _turn(turn) {
+Board::Board(const std::string& str) {
+    std::stringstream ss(str);  // Using a sstream to split by whitespace.
+    std::string board_string;
+    char turn;
+    ss >> board_string >> turn;
+
+    // Set the turn.
+    _turn = Pebbles::from_char(turn);
+
+    // Fill squares.
     int i = 0;
     for (int y = 0; y < Y_SIZE; ++y) {
         for (int x = 0; x < X_SIZE; ++x) {
@@ -21,29 +33,38 @@ Board::Board(std::string board_string, Pebble turn) : _turn(turn) {
     }
 }
 
+std::string Board::to_string() const {
+    std::ostringstream oss;
+    for (const Hole& hole : Holes::valid_holes) {
+        const auto p = (*this)(hole);
+        oss << (p == Pebble::P1 ? '1' :
+                p == Pebble::P2 ? '2' : '0');
+    }
+    oss << ' ' << Pebbles::get_char(_turn);
+    return oss.str();
+}
+
 
 std::ostream &operator<<(std::ostream &strm, const Board &b) {
     for (int y = 0; y < Y_SIZE; ++y) {
-        strm << std::setw(2) << (char) ('0' + y) << "|";
+        strm << std::setw(2) << (char) ('A' + y) << "|";
         for (int x = 0; x < X_SIZE; ++x) {
             strm << Pebbles::get_char(b(y, x)) << ' ';
         }
         strm << '\n';
     }
 
-    // For printing the x-axis, the numbers 10 to 18 are printed
-    // using the chars after '9', as without this they would be
-    // two symbols wide and not align with the drawing of the board.
     strm << "   ";
     for (int x = 0; x < X_SIZE; ++x) strm << "--";
     strm << "\n   ";
     for (char x = 0; x < X_SIZE; ++x) {
-        strm << (char) ('0' + x) << ' ';
+        strm << (char) ('a' + x) << ' ';
     }
     return strm;
 }
 
 void Board::make_move(const Move &move) {
+
     assert((*this)(move.from) == _turn);
     (*this)(move.to) = (*this)(move.from);
     (*this)(move.from) = Pebble::NO_PEBBLE;
