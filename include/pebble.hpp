@@ -38,16 +38,32 @@ inline constexpr bool is_pebble(Pebble pebble) {
     return pebble == Pebble::P1 or pebble == Pebble::P2;
 }
 
+constexpr int CHARS_SIZE = 3;
+constexpr std::array<char, CHARS_SIZE> chars = {
+    '.', 'x', '+'
+};
+
 inline constexpr char get_char(Pebble pebble) {
     switch (pebble) {
         case Pebble::NO_PEBBLE:
-            return '.';
         case Pebble::P1:
-            return 'x';
         case Pebble::P2:
-            return '+';
+            return chars[static_cast<int>(pebble)];
         default:
             return ' ';
+    }
+}
+
+inline constexpr Pebble from_char(char pebble) {
+    switch (pebble) {
+        case '.':
+            return Pebble::NO_PEBBLE;
+        case 'x':
+            return Pebble::P1;
+        case '+':
+            return Pebble::P2;
+        default:
+            return Pebble::INVALID;
     }
 }
 
