@@ -5,6 +5,10 @@ namespace ricefish {
 MoveList<MoveEntry> &MoveGenerator::get_moves(Board &board) {
     moves.size = 0;
 
+    // If the position is won, there are no more moves.
+    if (board.get_winner() != Pebble::NO_PEBBLE)
+        return moves;
+
     // Generate main moves (no quiescent moves at this time).
     add_moves(moves, board);
 
